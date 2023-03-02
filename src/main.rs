@@ -100,7 +100,7 @@ impl IcySysMonitor {
     /// Returns the widget storing the cpu usage
     fn get_cpu_usage_element(&self) -> iced::Element<Message> {
         // The column that will hold the cpu usage
-        let mut cpu_column = column![].spacing(10);
+        let mut cpu_column = column![].spacing(10).width(iced::Length::Fill);
 
         for (i, cpu) in self.sys.cpus().iter().enumerate() {
             // get the cpu usage as a percentage
@@ -109,14 +109,18 @@ impl IcySysMonitor {
             // Progress bar widget storing the cpu usage
             let progress_bar = ProgressBar::new(0.0..=100.0, cpu_usage);
 
-            // Round the cpu usage to 2 decimal places
-            let cpu_usage = format!("{:.2}", cpu_usage);
+            // Round the cpu usage to 2 decimal places and left pad to 6 characters
+            // So that the width is always the same
+            let cpu_usage = format!("{:06.2}", cpu_usage);
+
+
+
 
             // Text widget storing the cpu usage
             let text_widget = Text::new(format!("CPU {i}: {cpu_usage}%"));
 
             // push the column containing the cpu usage
-            cpu_column = cpu_column.push(row![text_widget, progress_bar].spacing(20));
+            cpu_column = cpu_column.push(row![text_widget, progress_bar].spacing(20).width(iced::Length::Fill));
         }
 
         cpu_column.into()
