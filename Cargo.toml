@@ -6,5 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-iced = "0.8.0"
+bytesize = "1.2.0"
+iced = { version = "0.8.0", features = ["tokio"] }
+rand = "0.8.5"
 sysinfo = "0.28.1"
+tokio = { version = "1.26.0", features = ["full"] }

@@ -1,6 +1,8 @@
+use bytesize::ByteSize;
 use iced::{
+    subscription,
     widget::{button, column, Text},
-    Sandbox,
+    Application, Command,
 };
 use sysinfo::{CpuExt, System, SystemExt};
 
@@ -19,25 +21,32 @@ struct IcySysMonitor {
     sys: System,
 }
 
-impl Sandbox for IcySysMonitor {
+impl Application for IcySysMonitor {
+    type Executor = iced::executor::Default;
+    type Theme = iced::theme::Theme;
+    type Flags = ();
     type Message = Message;
 
-    fn new() -> Self {
-        Self {
-            sys: System::new_all(),
-        }
+    fn new(_flags: ()) -> (Self, iced::Command<Self::Message>) {
+        (
+            Self {
+                sys: System::new_all(),
+            },
+            Command::none(),
+        )
     }
 
     fn title(&self) -> String {
         String::from("Icy System Monitor")
     }
 
-    fn update(&mut self, message: Self::Message) {
+    fn update(&mut self, message: Self::Message) -> iced::Command<Self::Message> {
         match message {
             Message::UpdateInfo => {
                 self.sys.refresh_all();
             }
         }
+        Command::none()
     }
 
     fn view(&self) -> iced::Element<'_, Self::Message> {
@@ -54,18 +63,29 @@ impl Sandbox for IcySysMonitor {
         .align_items(iced::Alignment::Center)
         .into()
     }
+
+    fn subscription(&self) -> iced::Subscription<Self::Message> {
+        // Get a random number
+        let id = rand::random::<u64>();
+
+        // The subscription that handles the updating of the system info
+        // True is passed in as the second argument as our subscription doesn't have any state
+        subscription::unfold(id, true, |_state| async move {
+            // Wait 1 second before sending the next message
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+
+            // Returns the UpdateInfo message and
+            (Some(Message::UpdateInfo), true)
+        })
+    }
 }
 
 impl IcySysMonitor {
     /// Returns the widget storing the memory usage
     fn get_memory_usage_element(&self) -> iced::Element<Message> {
-        // Get the memory usage
-        let used_memory = self.sys.used_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
-        let total_memory = self.sys.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
-
-        // Round the used_memory and total_memory to 2 decimal places
-        let used_memory = format!("{:.2}", used_memory);
-        let total_memory = format!("{:.2}", total_memory);
+        // Convert the memory usage to a human readable format
+        let used_memory = ByteSize(self.sys.used_memory());
+        let total_memory = ByteSize(self.sys.total_memory());
 
         // Return the memory usage as a text widget
         Text::new(format!("Memory: {used_memory} / {total_memory} GB")).into()
