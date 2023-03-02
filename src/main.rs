@@ -54,7 +54,6 @@ impl Application for IcySysMonitor {
             Text::new("Icy System Monitor").size(50),
             self.get_cpu_usage_element(),
             self.get_memory_usage_element(),
-            button(Text::new("Update")).on_press(Message::UpdateInfo),
         ]
         .width(iced::Length::Fill)
         .height(iced::Length::Fill)
