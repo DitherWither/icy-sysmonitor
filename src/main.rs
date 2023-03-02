@@ -87,7 +87,7 @@ impl IcySysMonitor {
         let total_memory = ByteSize(self.sys.total_memory());
 
         // Return the memory usage as a text widget
-        Text::new(format!("Memory: {used_memory} / {total_memory} GB")).into()
+        Text::new(format!("Memory: {used_memory} / {total_memory}")).into()
     }
 
     /// Returns the widget storing the cpu usage
