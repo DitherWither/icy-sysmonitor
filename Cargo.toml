@@ -1,7 +1,12 @@
 [package]
 name = "icy-sysmonitor"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+description = "A simple system monitor written in Rust using Iced"
+readme = "README.md"
+license = "MIT"
+homepage = "https://ditherwither.github.io/icy-sysmonitor/"
+repository = "https://github.com/ditherwither/icy-sysmonitor"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
