@@ -15,10 +15,13 @@ Once you have the toolchain installed, you can build the application by running 
 cargo build --release
 ```
 
+The application doesn't have any external dependencies, and the executables
+(`icy-sysmonitor` or `icy-sysmonitor.exe`) can be distibuted without any
+additional files.
+
 ## TODO
 
-- [ ] Add more system information
-- [ ] Add proper packaging for the application
-- [ ] Make the application look better
-- [ ] Configure CI to build the application
-- [ ] Add a download link for the application on github pages
+- Add more system information
+- Make the application look better
+- Configure CI to build the application
+- Add a download link for the application on github pages
