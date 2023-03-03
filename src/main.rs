@@ -5,6 +5,8 @@
 //! The system information is retrieved using the sysinfo crate.
 //! tokio is used as the async runtime for the iced application. 
 
+// Set the windows subsystem to windows to hide the console window on windows
+#![windows_subsystem = "windows"]
 
 use std::time::Duration;
 
