@@ -21,3 +21,5 @@ cargo build --release
 - [ ] Add proper packaging for the application
 - [ ] Make the application look better
 - [ ] Replace the "full" feature of tokio with the individual features that are required
+- [ ] Configure CI to build the application
+- [ ] Add a download link for the application on github pages
