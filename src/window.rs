@@ -201,6 +201,7 @@ impl ApplicationWindow {
         let settings_button =
             button(Text::new("Settings").size(20)).on_press(ApplicationMessage::OpenSettings);
 
+
         // Create the header
         row![title, home_button, settings_button]
             .width(iced::Length::Fill)
