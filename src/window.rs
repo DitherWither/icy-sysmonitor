@@ -87,9 +87,7 @@ pub enum MainWindowPage {
     Home,
 
     /// The settings page of the main window
-    ///
-    /// TODO: Rename to just Settings
-    SettingsPage(SettingsState),
+    Settings(SettingsState),
 }
 
 /// The implementation of the application
@@ -129,7 +127,7 @@ impl Application for ApplicationWindow {
 
             // Open the settings page
             ApplicationMessage::OpenSettings => {
-                self.page = MainWindowPage::SettingsPage(SettingsState::new(&self.config));
+                self.page = MainWindowPage::Settings(SettingsState::new(&self.config));
             }
 
             // Open the home page
@@ -152,7 +150,7 @@ impl Application for ApplicationWindow {
         // The main content of the main window
         let main_content = match &self.page {
             MainWindowPage::Home => self.home_page_view(),
-            MainWindowPage::SettingsPage(state) => self.settings_page_view(state).map(|message| {
+            MainWindowPage::Settings(state) => self.settings_page_view(state).map(|message| {
                 // Map the message to the application's message
                 ApplicationMessage::SettingsPageUpdated(message)
             }),
