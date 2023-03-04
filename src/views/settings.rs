@@ -73,7 +73,7 @@ impl ApplicationWindow {
     pub fn settings_page_update(&mut self, message: &SettingsMessage) {
         match message {
             SettingsMessage::UpdateIntervalChanged(value) => {
-                if let MainWindowPage::SettingsPage(state) = &mut self.page {
+                if let MainWindowPage::Settings(state) = &mut self.page {
                     // Value is in seconds, convert to milliseconds
                     state.update_interval = (*value * 1000.0) as u64;
                 } else {
@@ -84,7 +84,7 @@ impl ApplicationWindow {
             }
             SettingsMessage::SaveSettings => {
                 // TODO: Add error handling
-                if let MainWindowPage::SettingsPage(state) = &mut self.page {
+                if let MainWindowPage::Settings(state) = &mut self.page {
                     self.config.update_interval = state.update_interval;
                     self.config.save();
                 } else {
@@ -94,7 +94,7 @@ impl ApplicationWindow {
                 }
             }
             SettingsMessage::CancelSettings => {
-                if let MainWindowPage::SettingsPage(state) = &mut self.page {
+                if let MainWindowPage::Settings(state) = &mut self.page {
                     state.update_interval = self.config.update_interval;
                 } else {
                     panic!(
