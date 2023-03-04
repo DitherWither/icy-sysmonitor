@@ -71,36 +71,31 @@ impl ApplicationWindow {
     }
 
     pub fn settings_page_update(&mut self, message: &SettingsMessage) {
+        let state = match &mut self.page {
+            MainWindowPage::Settings(state) => state,
+            _ => {
+                // TODO: Make it show a dialog instead of printing to the terminal
+                eprintln!(
+                    "ApplicationMessage::SettingsPageUpdated was sent when the settings page \
+                        was not open, this should not happen!"
+                );
+                eprintln!("Please report this bug at https://github.com/DitherWither/icy-sysmonitor/issues");
+                eprintln!("Continuing as if nothing happened...");
+                return;
+            } 
+        };
+
         match message {
             SettingsMessage::UpdateIntervalChanged(value) => {
-                if let MainWindowPage::Settings(state) = &mut self.page {
-                    // Value is in seconds, convert to milliseconds
-                    state.update_interval = (*value * 1000.0) as u64;
-                } else {
-                    panic!(
-                        "The settings page was called but the page was not set to the settings page"
-                    );
-                }
+                // Value is in seconds, convert to milliseconds
+                state.update_interval = (*value * 1000.0) as u64;
             }
             SettingsMessage::SaveSettings => {
-                // TODO: Add error handling
-                if let MainWindowPage::Settings(state) = &mut self.page {
-                    self.config.update_interval = state.update_interval;
-                    self.config.save();
-                } else {
-                    panic!(
-                        "The settings page was called but the page was not set to the settings page"
-                    );
-                }
+                self.config.update_interval = state.update_interval;
+                self.config.save();
             }
             SettingsMessage::CancelSettings => {
-                if let MainWindowPage::Settings(state) = &mut self.page {
-                    state.update_interval = self.config.update_interval;
-                } else {
-                    panic!(
-                        "The settings page was called but the page was not set to the settings page"
-                    );
-                }
+                state.update_interval = self.config.update_interval;
             }
         }
     }
@@ -109,13 +104,13 @@ impl ApplicationWindow {
 /// The widgets used in the settings page
 impl ApplicationWindow {
     /// Returns the button row for saving and canceling the settings
-    /// 
+    ///
     /// This function returns the row that contains the save and cancel buttons.
     /// The save button should save the settings to disk.
     /// The cancel button should discard the changes to the settings.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```
     /// let buttons_row = self.get_settings_page_buttons_row();
     /// // This roughly looks like this:
@@ -134,12 +129,12 @@ impl ApplicationWindow {
 
     /// Returns the row that contains the update interval input slider and the label
     /// that shows the current value of the input slider
-    /// 
+    ///
     /// This function returns the row that contains the update interval input slider and the label
     /// that shows the current value of the input slider.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```
     /// let update_interval_row = self.get_update_interval_row();
     /// // This roughly looks like this:
