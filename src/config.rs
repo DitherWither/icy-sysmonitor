@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use directories_next::ProjectDirs;
 use serde::{Deserialize, Serialize};
 
@@ -45,14 +43,14 @@ impl Config {
                     eprintln!("Could not parse config file, defaulting to default values");
                     eprintln!("Please check the config file for errors");
 
-                    return Self::default();
+                    Self::default()
                 }
             }
         } else {
             // Create the config directory if it does not exist
             if !config_dir.exists() {
-                match std::fs::create_dir_all(config_dir){
-                    Ok(_) => {},
+                match std::fs::create_dir_all(config_dir) {
+                    Ok(_) => {}
                     Err(_) => {
                         eprintln!("Could not create config directory");
                         eprintln!("Please check the permissions of the config directory");
@@ -77,7 +75,7 @@ impl Config {
             };
 
             match std::fs::write(config_path, config_str) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(_) => {
                     eprintln!("Could not write config file, defaulting to default values");
                     eprintln!("Please check the permissions of the config directory");

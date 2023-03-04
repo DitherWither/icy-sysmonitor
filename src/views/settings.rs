@@ -82,7 +82,7 @@ impl ApplicationWindow {
                 eprintln!("Please report this bug at https://github.com/DitherWither/icy-sysmonitor/issues");
                 eprintln!("Continuing as if nothing happened...");
                 return;
-            } 
+            }
         };
 
         match message {
