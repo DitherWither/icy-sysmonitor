@@ -12,5 +12,8 @@ repository = "https://github.com/ditherwither/icy-sysmonitor"
 
 [dependencies]
 bytesize = "1.2.0"
+directories-next = "2.0.0"
 iced = { version = "0.8.0", features = ["tokio"] }
+serde = { version = "1.0.152", features = ["derive"] }
 sysinfo = "0.28.1"
+toml = "0.7.2"
