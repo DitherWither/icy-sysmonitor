@@ -1,8 +1,9 @@
 use iced::{
     time,
-    widget::{button, column, row, Text},
+    widget::{column, Text},
     Application, Command,
 };
+use iced_aw::{native::{tab_bar::tab_label, IconText}, TabBar, TabLabel, Icon};
 use std::time::Duration;
 use sysinfo::{System, SystemExt};
 
@@ -59,15 +60,7 @@ pub enum ApplicationMessage {
     /// This message is sent to the application every second to update the system info.
     UpdateInfo,
 
-    /// ApplicationMessage to open the settings view
-    ///
-    /// This message is sent to the application when the settings button is pressed.
-    OpenSettings,
-
-    /// ApplicationMessage to open the home view
-    ///
-    /// This message is sent to the application when the home button is pressed.
-    OpenHome,
+    TabSelected(usize),
 
     /// ApplicationMessage when the settings page is updated
     ///
@@ -88,6 +81,24 @@ pub enum MainWindowPage {
 
     /// The settings page of the main window
     Settings(SettingsState),
+}
+
+impl MainWindowPage {
+    fn to_index(&self) -> usize {
+        match self {
+            MainWindowPage::Home => 0,
+            MainWindowPage::Settings(_) => 1,
+        }
+    }
+    fn from_index(index: usize) -> Option<Self> {
+        match index {
+            0 => Some(MainWindowPage::Home),
+            1 => Some(MainWindowPage::Settings(SettingsState::new(
+                &config::Config::load(),
+            ))),
+            _ => None,
+        }
+    }
 }
 
 /// The implementation of the application
@@ -125,14 +136,16 @@ impl Application for ApplicationWindow {
                 self.sys.refresh_all();
             }
 
-            // Open the settings page
-            ApplicationMessage::OpenSettings => {
-                self.page = MainWindowPage::Settings(SettingsState::new(&self.config));
-            }
-
-            // Open the home page
-            ApplicationMessage::OpenHome => {
-                self.page = MainWindowPage::Home;
+            ApplicationMessage::TabSelected(index) => {
+                match MainWindowPage::from_index(index) {
+                    Some(page) => self.page = page,
+                    None => {
+                        // TODO: Create a error page instead of printing the error
+                        eprintln!("Invalid page index: {index}");
+                        eprintln!("How did you even get here?");
+                        eprintln!("Please report this bug on GitHub: https://github.com/DitherWither/icy-sysmonitor/issues")
+                    }
+                }
             }
 
             // Update the settings page
@@ -194,15 +207,12 @@ impl ApplicationWindow {
         // Create the title
         let title = Text::new("Icy System Monitor").size(50);
 
-        // Create the home button
-        let home_button = button(Text::new("Home").size(20)).on_press(ApplicationMessage::OpenHome);
-
-        // Create the settings button
-        let settings_button =
-            button(Text::new("Settings").size(20)).on_press(ApplicationMessage::OpenSettings);
-
+        // Create the tab bar for the pages
+        let tab_bar = TabBar::new(self.page.to_index(), ApplicationMessage::TabSelected)
+            .push(TabLabel::IconText(Icon::House.into(), "Home".to_string()))
+            .push(TabLabel::IconText(Icon::Gear.into(),"Settings".to_string()));
         // Create the header
-        row![title, home_button, settings_button]
+        column![title, tab_bar]
             .width(iced::Length::Fill)
             .height(iced::Length::Shrink)
             .padding(20)
