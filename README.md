@@ -7,7 +7,8 @@ The system information is retrieved using the `sysinfo` crate.
 
 ## Screenshots
 
-![screenshot of the application](screenshots/window-screenshot.png?raw=true "Screenshot of the application")
+![Screenshot of the Application](screenshots/window.png?raw=true "Screenshot of the Application")
+![Screenshot of the Settings Page](screenshots/settings.png?raw=true "Screenshot of the Settings page")
 
 ## Download
 
