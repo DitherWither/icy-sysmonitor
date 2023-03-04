@@ -32,9 +32,9 @@ pub struct ApplicationWindow {
     /// This object is used to store the settings of the application.
     /// The settings are stored in a config file in the user's home directory.
     /// The location of the config file is platform dependent.
-    /// On Linux it is stored in `~/.config/icy_sys_monitor/config.toml`
-    /// On Windows it is stored in `%APPDATA%\icy_sys_monitor\config.toml`
-    /// On MacOS should be stored in `~/Library/Application Support/io.github.DitherWither.icy_sys_monitor/config.toml`
+    ///  * On Linux it is stored in `~/.config/icy-sysmonitor/config.toml`
+    ///  * On Windows it is stored in `%APPDATA%\icy-sysmonitor\config.toml`
+    ///  * On MacOS should be stored in `~/Library/Application Support/io.github.DitherWither.icy-sysmonitor/config.toml`
     ///
     /// The config file is created if it does not exist.
     /// The default settings are used if the config file does not exist.
