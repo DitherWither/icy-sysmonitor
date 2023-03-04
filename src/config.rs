@@ -1,3 +1,5 @@
+use std::io;
+
 use directories_next::ProjectDirs;
 use serde::{Deserialize, Serialize};
 
@@ -11,18 +13,72 @@ pub struct Config {
 }
 
 impl Config {
+    /// Get the path to the config file
+    ///
+    /// This function will return the path to the config file.
+    fn get_config_path() -> std::path::PathBuf {
+        let project_dirs = ProjectDirs::from("io.github", "DitherWither", "icy-sysmonitor")
+            .expect("Could not get project directories"); // TODO: Remove this expect
+
+        let config_dir = project_dirs.config_dir();
+
+        config_dir.join("config.toml")
+    }
+
+    /// Ensures that the config file's parent directory exists
+    ///
+    /// This function will ensure that the config file's parent directory exists.
+    /// If it does not exist, it will create it.
+    /// If it does exist, it will do nothing.
+    ///
+    /// This function will print an error message and return an error if the
+    /// config file's parent directory does not exist and could not be created.
+    ///
+    /// This function will return Ok(()) if the config file's parent directory
+    /// exists or if it was successfully created.
+    ///
+    /// This function should be called before writing to the config file.
+    /// This function should not be called after the config file has been created.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the config file has no parent directory.
+    ///
+    /// This should never happen as the config file is always in a directory.
+    fn ensure_config_dir_exists() -> io::Result<()> {
+        let config_path = Self::get_config_path();
+
+        // The directory that the config file is in
+        let config_dir = config_path
+            .parent()
+            .expect("The config file has no parent directory. This should never happen.");
+
+        // Create the config directory if it does not exist
+        if !config_dir.exists() {
+            match std::fs::create_dir_all(config_dir) {
+                Ok(_) => Ok(()),
+                Err(_) => {
+                    eprintln!("Could not create config directory");
+                    eprintln!("Please check the permissions of the config directory");
+
+                    Err(io::Error::new(
+                        io::ErrorKind::PermissionDenied,
+                        "Could not create parent directory",
+                    ))
+                }
+            }
+        } else {
+            Ok(())
+        }
+    }
+
     /// Load the config from disk
     ///
     /// This function will load the config from disk and return it.
     /// If the config file does not exist, it will create a new one
     /// with the default values.
     pub fn load() -> Self {
-        let project_dirs = ProjectDirs::from("io.github", "DitherWither", "icy-sysmonitor")
-            .expect("Could not get project directories");
-
-        let config_dir = project_dirs.config_dir();
-
-        let config_path = config_dir.join("config.toml");
+        let config_path = Self::get_config_path();
 
         // Load the config from disk if it exists
         // TODO: Make this display a dialog instead of printing to stderr
@@ -48,15 +104,11 @@ impl Config {
             }
         } else {
             // Create the config directory if it does not exist
-            if !config_dir.exists() {
-                match std::fs::create_dir_all(config_dir) {
-                    Ok(_) => {}
-                    Err(_) => {
-                        eprintln!("Could not create config directory");
-                        eprintln!("Please check the permissions of the config directory");
-
-                        return Self::default();
-                    }
+            match Self::ensure_config_dir_exists() {
+                Ok(_) => {}
+                Err(_) => {
+                    // The error is already printed in the function
+                    return Self::default();
                 }
             }
 
@@ -94,17 +146,16 @@ impl Config {
     /// If the config file does not exist, it will create a new one.
     /// If the config file does exist, it will overwrite it.
     pub fn save(&self) {
-        let project_dirs = ProjectDirs::from("io.github", "DitherWither", "icy-sysmonitor")
-            .expect("Could not get project directories");
-
-        let config_dir = project_dirs.config_dir();
-
-        let config_path = config_dir.join("config.toml");
+        let config_path = Self::get_config_path();
 
         // Create the config directory if it does not exist
-        if !config_dir.exists() {
-            std::fs::create_dir_all(config_dir).expect("Could not create config directory");
-        }
+        match Self::ensure_config_dir_exists() {
+            Ok(_) => {}
+            // The error is already printed in the function
+            Err(_) => {
+                return;
+            }
+        };
 
         // Write the config to disk
         let config_str = toml::to_string(&self).expect("Could not serialize config");

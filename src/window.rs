@@ -3,7 +3,7 @@ use iced::{
     widget::{column, Text},
     Application, Command,
 };
-use iced_aw::{native::{tab_bar::tab_label, IconText}, TabBar, TabLabel, Icon};
+use iced_aw::{Icon, TabBar, TabLabel};
 use std::time::Duration;
 use sysinfo::{System, SystemExt};
 
@@ -210,7 +210,10 @@ impl ApplicationWindow {
         // Create the tab bar for the pages
         let tab_bar = TabBar::new(self.page.to_index(), ApplicationMessage::TabSelected)
             .push(TabLabel::IconText(Icon::House.into(), "Home".to_string()))
-            .push(TabLabel::IconText(Icon::Gear.into(),"Settings".to_string()));
+            .push(TabLabel::IconText(
+                Icon::Gear.into(),
+                "Settings".to_string(),
+            ));
         // Create the header
         column![title, tab_bar]
             .width(iced::Length::Fill)

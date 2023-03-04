@@ -28,6 +28,12 @@ pub enum SettingsMessage {
     /// This message is sent to the settings page when the cancel button is pressed.
     /// This message should discard the changes to the settings.
     CancelSettings,
+
+    /// Message to reset the settings to default
+    ///
+    /// This message is sent to the settings page when the reset button is pressed.
+    /// This message should reset the settings to the default settings.
+    ResetSettings,
 }
 
 /// The settings page's state
@@ -97,6 +103,15 @@ impl ApplicationWindow {
             SettingsMessage::CancelSettings => {
                 state.update_interval = self.config.update_interval;
             }
+            SettingsMessage::ResetSettings => {
+                self.config = Config::default();
+                self.config.save();
+
+                // This will update the settings page to show the default settings
+                // As the config is reloaded when canceling the settings
+                // TODO: This is a bit hacky, maybe find a better way to do this
+                self.settings_page_update(&SettingsMessage::CancelSettings);
+            }
         }
     }
 }
@@ -117,14 +132,21 @@ impl ApplicationWindow {
     /// // [Cancel] [Save settings]
     /// ```
     fn get_settings_page_buttons_row(&self) -> iced::Element<SettingsMessage> {
+        // Button to save the settings
+        let save_button = button(Text::new("Save")).on_press(SettingsMessage::SaveSettings);
+
         // Button to cancel the changes to the settings
+        // TODO: Make the cancel button red
         let cancel_button = button(Text::new("Cancel")).on_press(SettingsMessage::CancelSettings);
 
-        // Button to save the settings
-        let save_button =
-            button(Text::new("Save settings")).on_press(SettingsMessage::SaveSettings);
+        // Button to reset the settings to default
+        // TODO: Make the reset button red
+        let reset_button =
+            button(Text::new("Reset to Default")).on_press(SettingsMessage::ResetSettings);
 
-        row![cancel_button, save_button].spacing(10).into()
+        row![save_button, cancel_button, reset_button]
+            .spacing(10)
+            .into()
     }
 
     /// Returns the row that contains the update interval input slider and the label
